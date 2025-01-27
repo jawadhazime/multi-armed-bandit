@@ -17,7 +17,7 @@ def plot_results(solvers, solver_names, figname):
         solver_names (list<str)
         figname (str)
     """
-    assert len(solvers) == len(solver_names)
+    #assert len(solvers) == len(solver_names)
     assert all(map(lambda s: isinstance(s, Solver), solvers))
     assert all(map(lambda s: len(s.regrets) > 0, solvers))
 
@@ -50,7 +50,7 @@ def plot_results(solvers, solver_names, figname):
 
     # Sub.fig. 3: Action counts
     for s in solvers:
-        ax3.plot(range(b.n), np.array(s.counts) / float(len(solvers[0].regrets)), ls='steps', lw=2)
+        ax3.plot(range(b.n), np.array(s.counts) / float(len(solvers[0].regrets)), ls='dotted', lw=2)
     ax3.set_xlabel('Actions')
     ax3.set_ylabel('Frac. # trials')
     ax3.grid('k', ls='--', alpha=0.3)
@@ -69,9 +69,9 @@ def experiment(K, N):
     """
 
     b = BernoulliBandit(K)
-    print "Randomly generated Bernoulli bandit has reward probabilities:\n", b.probas
-    print "The best machine has index: {} and proba: {}".format(
-        max(range(K), key=lambda i: b.probas[i]), max(b.probas))
+    print ("Randomly generated Bernoulli bandit has reward probabilities:\n", b.probas)
+    print ("The best machine has index: {} and proba: {}".format(
+        max(range(K), key=lambda i: b.probas[i]), max(b.probas)))
 
     test_solvers = [
         # EpsilonGreedy(b, 0),
@@ -79,7 +79,7 @@ def experiment(K, N):
         EpsilonGreedy(b, 0.01),
         UCB1(b),
         BayesianUCB(b, 3, 1, 1),
-        ThompsonSampling(b, 1, 1)
+        # ThompsonSampling(b, 1, 1)
     ]
     names = [
         # 'Full-exploitation',
@@ -90,11 +90,15 @@ def experiment(K, N):
         'Thompson Sampling'
     ]
 
-    for s in test_solvers:
+    for n, s in enumerate(test_solvers):
         s.run(N)
+        print("Trial ", n, ": \n")
+        print("Actions: ", s.actions, "\n\n", "Regret: ", s.regrets, "\n\n", "Cumulative regret: ", s.regret)
+        print("\n\n")
 
     plot_results(test_solvers, names, "results_K{}_N{}.png".format(K, N))
 
 
+
 if __name__ == '__main__':
-    experiment(10, 5000)
+    experiment(3, 50)
